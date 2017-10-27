@@ -2,8 +2,8 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/target.mk
 
 PKG_NAME:=skywifi
-PKG_VERSION:=1.0.2
-PKG_RELEASE:=2
+PKG_VERSION:=1.0.3
+PKG_RELEASE:=3
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
 include $(INCLUDE_DIR)/package.mk
 
@@ -12,7 +12,7 @@ define Package/skywifi
 	SECTION:=utils
 	CATEGORY:=Utilities
 	TITLE:=skywifi
-	DEPENDS:=+libstdcpp +libopenssl +boost-system +boost-thread +libatomic
+	DEPENDS:=+boost +libstdcpp +libopenssl +boost-system +boost-thread +libatomic
 endef
 
 define Package/skywifi/description

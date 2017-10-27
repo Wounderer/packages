@@ -1,0 +1,18 @@
+{
+  "server"  : "80.93.182.86",
+  "port"  : 8000,
+  "leds" : true,
+  "realm" : "realm1",
+  "debug" : true,
+  "red_led" : "/sys/devices/platform/ath79-gpio/gpio/gpio2/value",
+  "green_led" : "/sys/class/leds/rb:green:port5/brightness",
+  "mac_file" : "/sys/class/net/eth0/address",
+  "secret" : "secret123",
+  "salt"  : "dgfngvbu",
+  "version" : "1.0.1",
+  "report_interval" : 2000000,
+  "component_auth" : "app.sharedpool.auth",
+  "component_report" : "app.sharedpool.report",
+  "component_regdevice" : "app.sharedpool.regdevice",
+  "component_captivesession" : "app.sharedpool.captivesession"
+}

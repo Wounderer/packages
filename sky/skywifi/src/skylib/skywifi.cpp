@@ -78,8 +78,4 @@ namespace skywifi {
     }
 
 
-    inline void skywifi::config::getconfig() {
-        std::cerr << "getting config" << std::endl;
-    }
-
 }
