@@ -17,6 +17,15 @@ namespace sky {
         }));
     }
 
+    unsigned long memUsage() {
+        struct sysinfo si;
+        if (sysinfo(&si) != 0)
+        {
+            return 1;
+        }
+        unsigned long result = si.freeram * si.mem_unit;
+        return result;
+    }
 
     void rtrim(std::string &s) {
         s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {

@@ -63,7 +63,7 @@ CMAKE_BINARY_DIR = /disk/packages/sky/skywifi/cmake-build-debug
 # Target rules for target CMakeFiles/skywifi.dir
 
 # All Build rule for target.
-CMakeFiles/skywifi.dir/all: CMakeFiles/skywifilib.dir/all
+CMakeFiles/skywifi.dir/all:
 	$(MAKE) -f CMakeFiles/skywifi.dir/build.make CMakeFiles/skywifi.dir/depend
 	$(MAKE) -f CMakeFiles/skywifi.dir/build.make CMakeFiles/skywifi.dir/build
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/disk/packages/sky/skywifi/cmake-build-debug/CMakeFiles --progress-num=1,2 "Built target skywifi"
@@ -76,7 +76,7 @@ all: CMakeFiles/skywifi.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/skywifi.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /disk/packages/sky/skywifi/cmake-build-debug/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /disk/packages/sky/skywifi/cmake-build-debug/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/skywifi.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /disk/packages/sky/skywifi/cmake-build-debug/CMakeFiles 0
 .PHONY : CMakeFiles/skywifi.dir/rule
@@ -93,43 +93,6 @@ CMakeFiles/skywifi.dir/clean:
 
 # clean rule for target.
 clean: CMakeFiles/skywifi.dir/clean
-
-.PHONY : clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/skywifilib.dir
-
-# All Build rule for target.
-CMakeFiles/skywifilib.dir/all:
-	$(MAKE) -f CMakeFiles/skywifilib.dir/build.make CMakeFiles/skywifilib.dir/depend
-	$(MAKE) -f CMakeFiles/skywifilib.dir/build.make CMakeFiles/skywifilib.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/disk/packages/sky/skywifi/cmake-build-debug/CMakeFiles --progress-num=3,4 "Built target skywifilib"
-.PHONY : CMakeFiles/skywifilib.dir/all
-
-# Include target in all.
-all: CMakeFiles/skywifilib.dir/all
-
-.PHONY : all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/skywifilib.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /disk/packages/sky/skywifi/cmake-build-debug/CMakeFiles 2
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/skywifilib.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /disk/packages/sky/skywifi/cmake-build-debug/CMakeFiles 0
-.PHONY : CMakeFiles/skywifilib.dir/rule
-
-# Convenience name for target.
-skywifilib: CMakeFiles/skywifilib.dir/rule
-
-.PHONY : skywifilib
-
-# clean rule for target.
-CMakeFiles/skywifilib.dir/clean:
-	$(MAKE) -f CMakeFiles/skywifilib.dir/build.make CMakeFiles/skywifilib.dir/clean
-.PHONY : CMakeFiles/skywifilib.dir/clean
-
-# clean rule for target.
-clean: CMakeFiles/skywifilib.dir/clean
 
 .PHONY : clean
 

@@ -7,9 +7,22 @@
 
 #include <boost/property_tree/ptree.hpp>
 #include "boost/property_tree/json_parser.hpp"
-
+#include <sys/sysinfo.h>
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <streambuf>
+#include <tuple>
+#include <boost/asio.hpp>
+#include <boost/atomic.hpp>
+#include "autobahn/autobahn.hpp"
+#include <linux/types.h>
+#include <boost/thread.hpp>
+#include <stdexcept>
+#include <stdio.h>
+#include <boost/bind.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 using boost::property_tree::ptree;
-
 
 
 namespace sky {
@@ -22,16 +35,25 @@ namespace sky {
 
     void led_off();
 
+    void ltrim(std::string &s);
+    void rtrim(std::string &s);
+    void trim(std::string &s);
+
+    unsigned long memUsage();
+
     class Settings {
     public:
         Settings( std::string filename ){
             std::ifstream jsonFile( filename );
             read_json(jsonFile, this->currentSettings);
             jsonFile.close();
+            std::ifstream macFile( this->currentSettings.get<std::string>("mac_file") );
+            std::stringstream buffer;
+            buffer << macFile.rdbuf();
+            std::string mac = buffer.str();
+            sky::trim( mac );
+            this->currentSettings.add("mac", mac );
         }
-        void loadSettings( char filename ) {
-
-        };
         template < typename Type >
         Type get( std::string option ) {
             return this->currentSettings.get<Type>( option );
@@ -41,7 +63,8 @@ namespace sky {
         ptree currentSettings;
     };
 
-};
+}
 
+#include "skywifi.cpp"
 
 #endif //CROSSBAR_SKY_SKYWIFI_HPP

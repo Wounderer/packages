@@ -1,4 +1,3 @@
+/disk/packages/sky/skywifi/cmake-build-debug/CMakeFiles/rebuild_cache.dir
 /disk/packages/sky/skywifi/cmake-build-debug/CMakeFiles/edit_cache.dir
 /disk/packages/sky/skywifi/cmake-build-debug/CMakeFiles/skywifi.dir
-/disk/packages/sky/skywifi/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/disk/packages/sky/skywifi/cmake-build-debug/CMakeFiles/skywifilib.dir

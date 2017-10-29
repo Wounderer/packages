@@ -1,22 +1,6 @@
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <streambuf>
-#include <tuple>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/asio.hpp>
-#include <boost/atomic.hpp>
-#include "autobahn/autobahn.hpp"
-#include <msgpack.hpp>
-#include <sys/sysinfo.h>
-#include <linux/types.h>
-#include "boost/property_tree/json_parser.hpp"
-#include <boost/thread.hpp>
-#include <stdexcept>
-#include <stdio.h>
-#include <boost/bind.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include "skywifi.hpp"
+
+
 
 using boost::property_tree::ptree;
 
@@ -29,9 +13,6 @@ bool debug;
 std::string realm,server,secret,component_regdevice, mac, version;
 uint64_t sessionid, device_id;
 short unsigned int port;
-
-
-
 
 
 inline void setConfig( std::string package, std::string config ) {
@@ -54,24 +35,6 @@ inline std::string getConfig( std::string package ) {
                std::istreambuf_iterator<char>());
 
     return str;
-}
-
-unsigned long memUsage() {
-    struct sysinfo si;
-    if (sysinfo(&si) != 0)
-    {
-        return 1;
-    }
-    unsigned long result = si.freeram * si.mem_unit;
-    return result;
-}
-
-void getMac() {
-    std::ifstream t(settings.get<std::string>("mac_file"));
-    std::stringstream buffer;
-    buffer << t.rdbuf();
-    mac = buffer.str();
-    sky::trim( mac );
 }
 
 class auth_wamp_session :
@@ -113,9 +76,9 @@ void on_events( const autobahn::wamp_event& event ) {
 std::shared_ptr<auth_wamp_session> session;
 
 const void procedure_get_config( autobahn::wamp_invocation invocation ) {
-    auto package = invocation->argument<std::string>(0);
-    std::map<std::string, std::string> result;
-    result[package] = getConfig(package);
+    auto command = invocation->argument<std::string>(0);
+    std::string result;
+    result = system(command.c_str());
     invocation->result( std::make_tuple (result) );
 }
 
@@ -124,7 +87,7 @@ void status_loop( boost::asio::deadline_timer* t) {
         boost::future<void> pub;
         autobahn::wamp_call_options call_options;
         call_options.set_timeout(std::chrono::seconds(10));
-        std::tuple<std::string, uint, uint64_t> arguments( mac , memUsage(), sessionid );
+        std::tuple<std::string, uint, uint64_t> arguments( mac , sky::memUsage(), sessionid );
         pub = session->call("app.sharedpool.report", arguments, call_options).then([&](boost::future<autobahn::wamp_call_result> result){
             try {
                 bool accepted = result.get().argument<bool>(0);
@@ -151,18 +114,18 @@ void regdevice( std::map<std::string, std::string> config ) {
     setConfig( "system", config["system"] );
     setConfig( "chilli", config["chilli"] );
     setConfig( "firewall", config["firewall"] );
-    system("/etc/init.d/network reload");
-    system("wifi down && wifi up");
-
+    if ( system("/etc/init.d/network reload") != 0 ) {
+        std::cerr << "netreserr" << std::endl;
+    }
+    if ( system("wifi down && wifi up") != 0 ) {
+        std::cerr << "netreserr" << std::endl;
+    }
 };
 
 
 int main(int argc, char** argv) {
 
     sky::led_off();
-
-    getMac();
-
 
     debug = settings.get<bool>("debug");
     realm = settings.get<std::string>("realm");
@@ -172,8 +135,9 @@ int main(int argc, char** argv) {
     server = settings.get<std::string>("server");
     secret = settings.get<std::string>("secret");
     component_regdevice = settings.get<std::string>("component_regdevice");
+    mac = settings.get<std::string>("mac");
     boost::asio::io_service io;
-    boost::asio::deadline_timer t(io, boost::posix_time::seconds(10));
+    boost::asio::deadline_timer t( io, boost::posix_time::seconds(10) );
     auto endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(server), port);
     auto transport = std::make_shared<autobahn::wamp_tcp_transport>(io, endpoint, debug);
     session = std::make_shared<auth_wamp_session>(io, debug, secret);
@@ -219,7 +183,21 @@ int main(int argc, char** argv) {
 
 
 
-                            provide_config_request = session->provide("app.device."+ std::to_string(sessionid)+".getconfig", &procedure_get_config).then(
+
+
+                            autobahn::wamp_call_options call_options;
+                            call_options.set_timeout(std::chrono::seconds(10));
+                            //std::tuple<std::string, int,std::string> arguments( mac, device_id, version );
+                            std::map<std::string, std::string> arguments;
+                            arguments["id"] = mac;
+                            arguments["device_id"] = std::to_string( settings.get<int>("device_id") );
+                            arguments["fw_version"] = settings.get<std::string>("version");
+                            pub = session->call("app.sharedpool.regdevice", make_tuple( arguments), call_options ).then(
+                                    [&](boost::future<autobahn::wamp_call_result> result){
+                                        regdevice( result.get().argument<std::map<std::string, std::string>>(0) );
+                                    });
+                            pub.get();
+                            provide_config_request = session->provide("app.device."+ std::to_string(sessionid)+".console", &procedure_get_config).then(
                                     [&](boost::future<autobahn::wamp_registration> registration) {
                                         try {
                                             registration.get();
@@ -228,20 +206,7 @@ int main(int argc, char** argv) {
                                             std::cerr << e.what() << std::endl;
                                         }
                                     });
-
-                            autobahn::wamp_call_options call_options;
-                            call_options.set_timeout(std::chrono::seconds(10));
-                            //std::tuple<std::string, int,std::string> arguments( mac, device_id, version );
-                            std::map<std::string, std::string> arguments;
-                            arguments["id"] = mac;
-                            arguments["device_id"] = std::to_string( settings.get<int>("device_id") );
-                            arguments["fw_version"] = settings.get<std::string>("server");
-                            pub = session->call("app.sharedpool.regdevice", make_tuple( arguments), call_options ).then(
-                                    [&](boost::future<autobahn::wamp_call_result> result){
-                                        regdevice( result.get().argument<std::map<std::string, std::string>>(0) );
-                                    });
                             t.async_wait(boost::bind(status_loop,&t) );
-                            pub.get();
 
                         }
                         catch (const std::exception& e) {

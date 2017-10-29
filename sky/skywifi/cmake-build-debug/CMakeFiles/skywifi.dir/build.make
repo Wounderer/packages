@@ -90,7 +90,6 @@ skywifi_EXTERNAL_OBJECTS =
 
 skywifi: CMakeFiles/skywifi.dir/src/main.cpp.o
 skywifi: CMakeFiles/skywifi.dir/build.make
-skywifi: libskywifilib.a
 skywifi: /usr/local/lib/libboost_system.so
 skywifi: /usr/local/lib/libboost_thread.so
 skywifi: /usr/local/lib/libboost_random.so
