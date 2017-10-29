@@ -14,67 +14,25 @@
 #include <boost/thread.hpp>
 #include <stdexcept>
 #include <stdio.h>
-
+#include <boost/bind.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include "skywifi.hpp"
 
 using boost::property_tree::ptree;
+
 namespace pt = boost::property_tree;
 
-ptree settings;
+sky::Settings settings("/etc/config.json");
 
-void loadFromFile(const char* filename ) {
-    std::ifstream jsonFile( filename );
-    read_json(jsonFile, settings);
-}
+bool debug;
 
-bool debug,leds;
-
-std::string realm,server,secret,component_regdevice, mac;
-uint64_t sessionid;
+std::string realm,server,secret,component_regdevice, mac, version;
+uint64_t sessionid, device_id;
 short unsigned int port;
-// trim from start (in place)
-static inline void ltrim(std::string &s) {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
-        return !std::isspace(ch);
-    }));
-}
 
-// trim from end (in place)
-static inline void rtrim(std::string &s) {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
-        return !std::isspace(ch);
-    }).base(), s.end());
-}
 
-static inline void trim(std::string &s) {
-    ltrim(s);
-    rtrim(s);
-}
 
-std::ofstream fileGreen;
-std::ofstream fileRed;
 
-inline void led_red() {
-    if ( leds ) {
-        fileGreen << "0";
-        fileRed << "1";
-    }
-}
-
-inline void led_green() {
-    if ( leds ) {
-        if ( leds ) {
-            fileGreen << "1";
-            fileRed << "0";
-        }
-    }
-}
-
-inline void led_off() {
-    if ( leds ) {
-        fileGreen << "0";
-        fileRed << "0";
-    }
-}
 
 inline void setConfig( std::string package, std::string config ) {
     std::string filename = "/etc/config/" + package;
@@ -108,12 +66,12 @@ unsigned long memUsage() {
     return result;
 }
 
-inline void getMac() {
+void getMac() {
     std::ifstream t(settings.get<std::string>("mac_file"));
     std::stringstream buffer;
     buffer << t.rdbuf();
     mac = buffer.str();
-    trim( mac );
+    sky::trim( mac );
 }
 
 class auth_wamp_session :
@@ -161,13 +119,9 @@ const void procedure_get_config( autobahn::wamp_invocation invocation ) {
     invocation->result( std::make_tuple (result) );
 }
 
-boost::future<void> status_loop( ) {
+void status_loop( boost::asio::deadline_timer* t) {
 
-    while (true)
-    {
-        std::cerr << "Rep:" << std::endl;
         boost::future<void> pub;
-
         autobahn::wamp_call_options call_options;
         call_options.set_timeout(std::chrono::seconds(10));
         std::tuple<std::string, uint, uint64_t> arguments( mac , memUsage(), sessionid );
@@ -186,28 +140,40 @@ boost::future<void> status_loop( ) {
                 return;
             }
         });
-        useconds_t interval = 2000000;
-        usleep( interval );
-        std::cerr << "Reporting status" << std::endl;
-    }
+        t->expires_at(t->expires_at() + boost::posix_time::seconds(10));
+        t->async_wait(boost::bind(status_loop,t));
 
 }
 
 void regdevice( std::map<std::string, std::string> config ) {
-    std::cerr << "Registering device" << std::endl;
     setConfig( "network", config["network"] );
     setConfig( "wireless", config["wireless"] );
-    std::cerr << "Configuration saved" << std::endl;
+    setConfig( "wireless", config["system"] );
+    setConfig( "wireless", config["chilli"] );
+    setConfig( "wireless", config["firewall"] );
     system("/etc/init.d/network reload");
     system("wifi down && wifi up");
-    status_loop();
+
 };
 
-int open_connection() {
 
+int main(int argc, char** argv) {
+
+    sky::led_off();
+
+    getMac();
+
+
+    debug = settings.get<bool>("debug");
+    realm = settings.get<std::string>("realm");
+    version = settings.get<std::string>("version");
+    port = settings.get<int>("port");
+    device_id = settings.get<int>("device_id");
+    server = settings.get<std::string>("server");
+    secret = settings.get<std::string>("secret");
+    component_regdevice = settings.get<std::string>("component_regdevice");
     boost::asio::io_service io;
-
-
+    boost::asio::deadline_timer t(io, boost::posix_time::seconds(10));
     auto endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(server), port);
     auto transport = std::make_shared<autobahn::wamp_tcp_transport>(io, endpoint, debug);
     session = std::make_shared<auth_wamp_session>(io, debug, secret);
@@ -227,15 +193,13 @@ int open_connection() {
     boost::future<void> pub;
     boost::future<void> sub;
 
-
-
     connect_future = transport->connect().then(
             [&](boost::future<void> connected) {
                 try {
                     connected.get();
                 } catch (const std::exception& e) {
                     std::cerr << e.what() << std::endl;
-                    led_red();
+                    sky::led_red();
                     io.stop();
                     return;
                 }
@@ -249,7 +213,7 @@ int open_connection() {
                         try {
                             std::cerr << "joined realm: " << std::endl;
                             sessionid = joined.get();
-                            led_green();
+                            sky::led_green();
                             std::cerr << "sessionid: " << sessionid << std::endl;
 
 
@@ -267,18 +231,23 @@ int open_connection() {
 
                             autobahn::wamp_call_options call_options;
                             call_options.set_timeout(std::chrono::seconds(10));
-                            std::tuple<std::string> arguments( mac );
-                            pub = session->call("app.sharedpool.regdevice", arguments, call_options).then(
+                            //std::tuple<std::string, int,std::string> arguments( mac, device_id, version );
+                            std::map<std::string, std::string> arguments;
+                            arguments["id"] = mac;
+                            arguments["device_id"] = std::to_string( settings.get<int>("device_id") );
+                            arguments["fw_version"] = settings.get<std::string>("server");
+                            pub = session->call("app.sharedpool.regdevice", make_tuple( arguments), call_options ).then(
                                     [&](boost::future<autobahn::wamp_call_result> result){
                                         regdevice( result.get().argument<std::map<std::string, std::string>>(0) );
                                     });
+                            t.async_wait(boost::bind(status_loop,&t) );
                             pub.get();
 
                         }
                         catch (const std::exception& e) {
                             std::cerr << e.what() << std::endl;
                             io.stop();
-                            led_red();
+                            sky::led_red();
                             return;
                         }
                     });
@@ -289,31 +258,13 @@ int open_connection() {
                     } catch (const std::exception& e) {
                         std::cerr << e.what() << std::endl;
                         io.stop();
-                        led_red();
+                        sky::led_red();
                         return;
                     }
                 });
 
             });
     io.run();
-
-}
-
-
-int main(int argc, char** argv) {
-    led_off();
-    loadFromFile("/etc/config.json");
-    getMac();
-    std::ofstream fileGreen( settings.get<std::string>("green_led") );
-    std::ofstream fileRed( settings.get<std::string>("red_led") );
-    debug = settings.get<bool>("debug");
-    leds = settings.get<bool>("leds");
-    realm = settings.get<std::string>("realm");
-    port = settings.get<int>("port");
-    server = settings.get<std::string>("server");
-    secret = settings.get<std::string>("secret");
-    component_regdevice = settings.get<std::string>("component_regdevice");
-    open_connection();
-    led_off();
+    sky::led_off();
     exit(1);
 }

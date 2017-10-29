@@ -54,4 +54,5 @@ CMakeFiles/skywifi.dir/src/main.cpp.o: ../src/autobahn/wamp_unregister_request.i
 CMakeFiles/skywifi.dir/src/main.cpp.o: ../src/autobahn/wamp_unsubscribe_request.hpp
 CMakeFiles/skywifi.dir/src/main.cpp.o: ../src/autobahn/wamp_unsubscribe_request.ipp
 CMakeFiles/skywifi.dir/src/main.cpp.o: ../src/main.cpp
+CMakeFiles/skywifi.dir/src/main.cpp.o: ../src/skywifi.hpp
 

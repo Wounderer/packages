@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/disk/packages/sky/skywifi/src/skywifi.cpp
+skywifi.hpp
+/disk/packages/sky/skywifi/src/skywifi.hpp
+
+/disk/packages/sky/skywifi/src/skywifi.hpp
+boost/property_tree/ptree.hpp
+-
+boost/property_tree/json_parser.hpp
+/disk/packages/sky/skywifi/src/boost/property_tree/json_parser.hpp
+

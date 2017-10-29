@@ -1,0 +1,2 @@
+/usr/bin/ar qc libskywifilib.a  CMakeFiles/skywifilib.dir/src/skywifi.cpp.o
+/usr/bin/ranlib libskywifilib.a

@@ -17,16 +17,6 @@
 					<DistClean command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
-			<Target title="rebuild_cache">
-				<Option working_dir="/disk/packages/sky/skywifi/cmake-build-debug"/>
-				<Option type="4"/>
-				<MakeCommands>
-					<Build command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
-					<CompileFile command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
-					<Clean command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-					<DistClean command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
-				</MakeCommands>
-			</Target>
 			<Target title="edit_cache">
 				<Option working_dir="/disk/packages/sky/skywifi/cmake-build-debug"/>
 				<Option type="4"/>
@@ -83,9 +73,71 @@
 					<DistClean command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
 				</MakeCommands>
 			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/disk/packages/sky/skywifi/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="skywifilib">
+				<Option output="/disk/packages/sky/skywifi/cmake-build-debug/libskywifilib.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/disk/packages/sky/skywifi/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 skywifilib"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="skywifilib/fast">
+				<Option output="/disk/packages/sky/skywifi/cmake-build-debug/libskywifilib.a" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/disk/packages/sky/skywifi/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/include/c++/5"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/5"/>
+					<Add directory="/usr/include/c++/5/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/5/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 skywifilib/fast"/>
+					<CompileFile command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j4 -f &quot;/disk/packages/sky/skywifi/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
 		</Build>
 		<Unit filename="/disk/packages/sky/skywifi/src/main.cpp">
 			<Option target="skywifi"/>
+		</Unit>
+		<Unit filename="/disk/packages/sky/skywifi/src/skywifi.cpp">
+			<Option target="skywifilib"/>
+		</Unit>
+		<Unit filename="/disk/packages/sky/skywifi/src/skywifi.hpp">
+			<Option target="skywifilib"/>
 		</Unit>
 		<Unit filename="/disk/packages/sky/skywifi/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>

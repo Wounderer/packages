@@ -501,4 +501,16 @@ stdexcept
 -
 stdio.h
 -
+boost/bind.hpp
+-
+boost/date_time/posix_time/posix_time.hpp
+-
+skywifi.hpp
+/disk/packages/sky/skywifi/src/skywifi.hpp
+
+/disk/packages/sky/skywifi/src/skywifi.hpp
+boost/property_tree/ptree.hpp
+-
+boost/property_tree/json_parser.hpp
+/disk/packages/sky/skywifi/src/boost/property_tree/json_parser.hpp
 

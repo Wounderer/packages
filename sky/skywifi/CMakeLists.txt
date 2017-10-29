@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 find_package(Boost REQUIRED COMPONENTS system thread random)
 find_package(OpenSSL REQUIRED)
 set(SOURCE_FILES src/main.cpp)
+add_library(skywifilib src/skywifi.cpp)
 add_executable(skywifi ${SOURCE_FILES})
 target_include_directories(skywifi INTERFACE
         src
@@ -12,7 +13,7 @@ target_include_directories(skywifi INTERFACE
         ${CMAKE_CURRENT_SOURCE_DIR}/msgpack-c/include
         ${SOURCE_FILES}/src/autobahn
         ${OPENSSL_INCLUDE_DIR})
-target_link_libraries(skywifi ${Boost_LIBRARIES}
+target_link_libraries(skywifi skywifilib ${Boost_LIBRARIES}
         sqlite3
         ${OPENSSL_LIBRARIES}
         ${CMAKE_THREAD_LIBS_INIT})

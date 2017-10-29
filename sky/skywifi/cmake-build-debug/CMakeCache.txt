@@ -260,6 +260,12 @@ crossbar_sky_BINARY_DIR:STATIC=/disk/packages/sky/skywifi/cmake-build-debug
 //Value Computed by CMake
 crossbar_sky_SOURCE_DIR:STATIC=/disk/packages/sky/skywifi
 
+//Dependencies for the target
+skywifi_LIB_DEPENDS:STATIC=general;/usr/local/lib/libboost_system.so;general;/usr/local/lib/libboost_thread.so;general;/usr/local/lib/libboost_random.so;general;/usr/local/lib/libboost_chrono.so;general;/usr/local/lib/libboost_date_time.so;general;/usr/local/lib/libboost_atomic.so;general;sqlite3;general;/usr/lib/x86_64-linux-gnu/libssl.so;general;/usr/lib/x86_64-linux-gnu/libcrypto.so;general;-lpthread;
+
+//Dependencies for target
+skywifilib_LIB_DEPENDS:STATIC=
+
 
 ########################
 # INTERNAL cache entries

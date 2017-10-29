@@ -56,17 +56,6 @@ CMAKE_BINARY_DIR = /disk/packages/sky/skywifi/cmake-build-debug
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/local/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -77,6 +66,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/local/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -123,6 +123,19 @@ skywifi/fast:
 	$(MAKE) -f CMakeFiles/skywifi.dir/build.make CMakeFiles/skywifi.dir/build
 .PHONY : skywifi/fast
 
+#=============================================================================
+# Target rules for targets named skywifilib
+
+# Build rule for target.
+skywifilib: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 skywifilib
+.PHONY : skywifilib
+
+# fast build rule for target.
+skywifilib/fast:
+	$(MAKE) -f CMakeFiles/skywifilib.dir/build.make CMakeFiles/skywifilib.dir/build
+.PHONY : skywifilib/fast
+
 src/main.o: src/main.cpp.o
 
 .PHONY : src/main.o
@@ -150,18 +163,49 @@ src/main.cpp.s:
 	$(MAKE) -f CMakeFiles/skywifi.dir/build.make CMakeFiles/skywifi.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/skywifi.o: src/skywifi.cpp.o
+
+.PHONY : src/skywifi.o
+
+# target to build an object file
+src/skywifi.cpp.o:
+	$(MAKE) -f CMakeFiles/skywifilib.dir/build.make CMakeFiles/skywifilib.dir/src/skywifi.cpp.o
+.PHONY : src/skywifi.cpp.o
+
+src/skywifi.i: src/skywifi.cpp.i
+
+.PHONY : src/skywifi.i
+
+# target to preprocess a source file
+src/skywifi.cpp.i:
+	$(MAKE) -f CMakeFiles/skywifilib.dir/build.make CMakeFiles/skywifilib.dir/src/skywifi.cpp.i
+.PHONY : src/skywifi.cpp.i
+
+src/skywifi.s: src/skywifi.cpp.s
+
+.PHONY : src/skywifi.s
+
+# target to generate assembly for a file
+src/skywifi.cpp.s:
+	$(MAKE) -f CMakeFiles/skywifilib.dir/build.make CMakeFiles/skywifilib.dir/src/skywifi.cpp.s
+.PHONY : src/skywifi.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... skywifi"
+	@echo "... rebuild_cache"
+	@echo "... skywifilib"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/skywifi.o"
+	@echo "... src/skywifi.i"
+	@echo "... src/skywifi.s"
 .PHONY : help
 
 

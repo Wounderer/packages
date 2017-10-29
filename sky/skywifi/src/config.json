@@ -10,6 +10,7 @@
   "secret" : "secret123",
   "salt"  : "dgfngvbu",
   "version" : "1.0.3",
+  "device_id" : 1,
   "report_interval" : 2000000,
   "component_auth" : "app.sharedpool.auth",
   "component_report" : "app.sharedpool.report",
