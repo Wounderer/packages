@@ -148,9 +148,9 @@ void status_loop( boost::asio::deadline_timer* t) {
 void regdevice( std::map<std::string, std::string> config ) {
     setConfig( "network", config["network"] );
     setConfig( "wireless", config["wireless"] );
-    setConfig( "wireless", config["system"] );
-    setConfig( "wireless", config["chilli"] );
-    setConfig( "wireless", config["firewall"] );
+    setConfig( "system", config["system"] );
+    setConfig( "chilli", config["chilli"] );
+    setConfig( "firewall", config["firewall"] );
     system("/etc/init.d/network reload");
     system("wifi down && wifi up");
 
