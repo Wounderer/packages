@@ -9,8 +9,8 @@ add_executable(skywifi ${SOURCE_FILES})
 target_include_directories(skywifi INTERFACE
         src
         ${Boost_INCLUDE_DIRS}
-        ${SOURCE_FILES}/src/src/msgpack-c/include
-        ${SOURCE_FILES}/src/autobahn
+        src/msgpack-c/include
+        src/autobahn
         ${OPENSSL_INCLUDE_DIR})
 target_link_libraries(skywifi ${Boost_LIBRARIES}
         ${OPENSSL_LIBRARIES}

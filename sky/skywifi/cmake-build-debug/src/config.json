@@ -9,7 +9,7 @@
   "mac_file" : "/sys/class/net/eth0/address",
   "secret" : "secret123",
   "salt"  : "dgfngvbu",
-  "version" : "1.0.3",
+  "version" : "1.0.5",
   "device_id" : 1,
   "report_interval" : 2000000,
   "component_auth" : "app.sharedpool.auth",

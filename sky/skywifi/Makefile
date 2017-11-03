@@ -2,7 +2,7 @@ include $(TOPDIR)/rules.mk
 include $(INCLUDE_DIR)/target.mk
 
 PKG_NAME:=skywifi
-PKG_VERSION:=1.0.4
+PKG_VERSION:=1.0.5
 PKG_RELEASE:=3
 PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)-$(PKG_VERSION)
 include $(INCLUDE_DIR)/package.mk
@@ -21,9 +21,7 @@ endef
 
 define Build/Prepare
 	mkdir -p $(PKG_BUILD_DIR)
-	$(CP) ./build/* $(PKG_BUILD_DIR)/
-	cd $(PKG_BUILD_DIR)
-	/usr/local/bin/cmake --build $(PKG_BUILD_DIR) --target skywifi
+	$(CP) ./src/* $(PKG_BUILD_DIR)/
 endef
 
 define Package/skywifi/install

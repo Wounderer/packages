@@ -472,10 +472,6 @@ wamp_unsubscribe_request.ipp
 skywifi.hpp
 /disk/packages/sky/skywifi/src/skywifi.hpp
 
-/disk/packages/sky/skywifi/src/skywifi.cpp
-skywifi.hpp
-/disk/packages/sky/skywifi/src/skywifi.hpp
-
 /disk/packages/sky/skywifi/src/skywifi.hpp
 boost/property_tree/ptree.hpp
 -
@@ -511,6 +507,4 @@ boost/bind.hpp
 -
 boost/date_time/posix_time/posix_time.hpp
 -
-skywifi.cpp
-/disk/packages/sky/skywifi/src/skywifi.cpp
 

@@ -1,15 +1,88 @@
 #include "skywifi.hpp"
-
-
-
 using boost::property_tree::ptree;
-
 namespace pt = boost::property_tree;
 
 sky::Settings settings("/etc/config.json");
 
 bool debug;
+namespace sky {
 
+    void ltrim(std::string &s) {
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+            return !std::isspace(ch);
+        }));
+    }
+
+    unsigned long memUsage() {
+        struct sysinfo si;
+        if (sysinfo(&si) != 0)
+        {
+            return 1;
+        }
+        unsigned long result = si.freeram * si.mem_unit;
+        return result;
+    }
+
+    unsigned long getUptime() {
+        struct sysinfo si;
+        if (sysinfo(&si) != 0)
+        {
+            return 1;
+        }
+        unsigned long result = si.uptime;
+        return result;
+    }
+
+    unsigned long getLoadAv() {
+        struct sysinfo si;
+        if (sysinfo(&si) != 0)
+        {
+            return 1;
+        }
+        unsigned long result = si.loads[1];
+        return result;
+    }
+
+
+    void rtrim(std::string &s) {
+        s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+            return !std::isspace(ch);
+        }).base(), s.end());
+    }
+
+    void trim(std::string &s) {
+        sky::ltrim(s);
+        sky::rtrim(s);
+    }
+
+    void led_red() {
+        std::ofstream fileGreen( settings.get<std::string>("green_led") );
+        std::ofstream fileRed( settings.get<std::string>("red_led") );
+        fileGreen << "0";
+        fileRed << "1";
+        fileGreen.close();
+        fileRed.close();
+    }
+
+    void led_green() {
+        std::ofstream fileGreen( settings.get<std::string>("green_led") );
+        std::ofstream fileRed( settings.get<std::string>("red_led") );
+        fileGreen << "1";
+        fileRed << "0";
+        fileGreen.close();
+        fileRed.close();
+    }
+
+    void led_off() {
+        std::ofstream fileGreen( settings.get<std::string>("green_led") );
+        std::ofstream fileRed( settings.get<std::string>("red_led") );
+        fileGreen << "0";
+        fileRed << "0";
+        fileGreen.close();
+        fileRed.close();
+    }
+
+}
 std::string realm,server,secret,component_regdevice, mac, version;
 uint64_t sessionid, device_id;
 short unsigned int port;
@@ -75,19 +148,48 @@ void on_events( const autobahn::wamp_event& event ) {
 }
 std::shared_ptr<auth_wamp_session> session;
 
-const void procedure_get_config( autobahn::wamp_invocation invocation ) {
-    auto command = invocation->argument<std::string>(0);
-    std::string result;
-    result = system(command.c_str());
-    invocation->result( std::make_tuple (result) );
+/**
+ * Установка конфигурации
+ * @param invocation
+ */
+const void procedure_set_config( autobahn::wamp_invocation invocation ) {
+    const std::string request_id = invocation->argument<std::string>(0);
+    const std::string config_section = invocation->argument<std::string>(1);
+    const std::string config_data = invocation->argument<std::string>(2);
+    const std::string afterApply = invocation->argument<std::string>(3);
+    if ( config_data.empty() || config_section.empty() ) {
+        std::cerr << "Empty config or package name!" << std::endl;
+        return;
+    } else {
+        setConfig( config_section, config_data );
+    }
+    std::string afterApplyResult;
+    if ( !afterApply.empty() ) {
+         afterApplyResult = system(afterApply.c_str());
+    } else {
+        afterApplyResult = "done";
+    }
+    invocation->result( std::make_tuple (request_id, afterApplyResult) );
+}
+
+/**
+ * Полученние конфигурации из файла
+ * @param invocation
+ */
+void procedure_get_config( autobahn::wamp_invocation invocation ) {
+    const std::string request_id = invocation->argument<std::string>(0);
+
+    const std::string config_section = invocation->argument<std::string>(1);
+    std::string configSectionData = getConfig( config_section );
+    std::vector <std::string>result = { request_id, configSectionData };
+            invocation->result( result );
 }
 
 void status_loop( boost::asio::deadline_timer* t) {
-
         boost::future<void> pub;
         autobahn::wamp_call_options call_options;
         call_options.set_timeout(std::chrono::seconds(10));
-        std::tuple<std::string, uint, uint64_t> arguments( mac , sky::memUsage(), sessionid );
+        std::tuple<std::string, uint, uint64_t, uint, uint> arguments( mac , sky::memUsage(), sessionid, sky::getUptime(), sky::getLoadAv());
         pub = session->call("app.sharedpool.report", arguments, call_options).then([&](boost::future<autobahn::wamp_call_result> result){
             try {
                 bool accepted = result.get().argument<bool>(0);
@@ -105,23 +207,7 @@ void status_loop( boost::asio::deadline_timer* t) {
         });
         t->expires_at(t->expires_at() + boost::posix_time::seconds(10));
         t->async_wait(boost::bind(status_loop,t));
-
 }
-
-void regdevice( std::map<std::string, std::string> config ) {
-    setConfig( "network", config["network"] );
-    setConfig( "wireless", config["wireless"] );
-    setConfig( "system", config["system"] );
-    setConfig( "chilli", config["chilli"] );
-    setConfig( "firewall", config["firewall"] );
-    if ( system("/etc/init.d/network reload") != 0 ) {
-        std::cerr << "netreserr" << std::endl;
-    }
-    if ( system("wifi down && wifi up") != 0 ) {
-        std::cerr << "netreserr" << std::endl;
-    }
-};
-
 
 int main(int argc, char** argv) {
 
@@ -138,6 +224,7 @@ int main(int argc, char** argv) {
     mac = settings.get<std::string>("mac");
     boost::asio::io_service io;
     boost::asio::deadline_timer t( io, boost::posix_time::seconds(10) );
+
     auto endpoint = boost::asio::ip::tcp::endpoint(boost::asio::ip::address::from_string(server), port);
     auto transport = std::make_shared<autobahn::wamp_tcp_transport>(io, endpoint, debug);
     session = std::make_shared<auth_wamp_session>(io, debug, secret);
@@ -177,6 +264,7 @@ int main(int argc, char** argv) {
                         try {
                             std::cerr << "joined realm: " << std::endl;
                             sessionid = joined.get();
+
                             sky::led_green();
                             std::cerr << "sessionid: " << sessionid << std::endl;
 
@@ -187,24 +275,26 @@ int main(int argc, char** argv) {
 
                             autobahn::wamp_call_options call_options;
                             call_options.set_timeout(std::chrono::seconds(10));
-                            //std::tuple<std::string, int,std::string> arguments( mac, device_id, version );
-                            std::map<std::string, std::string> arguments;
-                            arguments["id"] = mac;
-                            arguments["device_id"] = std::to_string( settings.get<int>("device_id") );
-                            arguments["fw_version"] = settings.get<std::string>("version");
-                            pub = session->call("app.sharedpool.regdevice", make_tuple( arguments), call_options ).then(
+                            pub = session->call("app.sharedpool.regdevice", make_tuple(mac,std::to_string( settings.get<int>("device_id") ),settings.get<std::string>("version"), std::to_string( sessionid )), call_options ).then(
                                     [&](boost::future<autobahn::wamp_call_result> result){
-                                        regdevice( result.get().argument<std::map<std::string, std::string>>(0) );
+                                        bool b_reg_Result = result.get().argument<bool>(0);
+                                        if ( b_reg_Result ) {
+                                            std::cerr << "Device registered succesfull" << std::endl;
+                                        } else {
+                                            io.stop(); // ? Просто ошибка регистрации, в принципе не критичная
+                                        }
+                                        //regdevice( result.get().argument<std::map<std::string, std::string>>(0) );
                                     });
                             pub.get();
-                            provide_config_request = session->provide("app.device."+ std::to_string(sessionid)+".console", &procedure_get_config).then(
+                            session->provide("app.device."+ std::to_string(sessionid)+".get_config", &procedure_get_config).then(
+                                    boost::launch::deferred,
                                     [&](boost::future<autobahn::wamp_registration> registration) {
-                                        try {
-                                            registration.get();
-                                            std::cerr << "registered get_config:" << registration.get().id() << std::endl;
-                                        } catch (const std::exception& e) {
-                                            std::cerr << e.what() << std::endl;
-                                        }
+                                        registration.get();
+                                    });
+                            session->provide("app.device."+ std::to_string(sessionid)+".set_config", &procedure_set_config).then(
+                                    boost::launch::deferred,
+                                    [&](boost::future<autobahn::wamp_registration> registration) {
+                                        registration.get();
                                     });
                             t.async_wait(boost::bind(status_loop,&t) );
 

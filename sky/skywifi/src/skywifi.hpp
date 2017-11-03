@@ -65,6 +65,5 @@ namespace sky {
 
 }
 
-#include "skywifi.cpp"
 
 #endif //CROSSBAR_SKY_SKYWIFI_HPP
