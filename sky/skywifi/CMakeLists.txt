@@ -15,4 +15,3 @@ target_include_directories(skywifi INTERFACE
 target_link_libraries(skywifi ${Boost_LIBRARIES}
         ${OPENSSL_LIBRARIES}
         ${CMAKE_THREAD_LIBS_INIT})
-configure_file(src/config.json src/config.json COPYONLY)

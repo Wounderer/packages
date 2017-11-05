@@ -5,7 +5,7 @@
 		<Option title="skywifi"/>
 		<Option makefile_is_custom="1"/>
 		<Option compiler="gcc"/>
-		<Option virtualFolders="CMake Files\;CMake Files\src\;"/>
+		<Option virtualFolders="CMake Files\;"/>
 		<Build>
 			<Target title="all">
 				<Option working_dir="/disk/packages/sky/skywifi/cmake-build-minsizerel"/>
@@ -89,9 +89,6 @@
 		</Unit>
 		<Unit filename="/disk/packages/sky/skywifi/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
-		</Unit>
-		<Unit filename="/disk/packages/sky/skywifi/src/config.json">
-			<Option virtualFolder="CMake Files\src\"/>
 		</Unit>
 	</Project>
 </CodeBlocks_project_file>

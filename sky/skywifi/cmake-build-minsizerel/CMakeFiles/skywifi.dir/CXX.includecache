@@ -471,6 +471,22 @@ wamp_unsubscribe_request.ipp
 /disk/packages/sky/skywifi/src/main.cpp
 skywifi.hpp
 /disk/packages/sky/skywifi/src/skywifi.hpp
+syslog.h
+-
+cstdio
+-
+iostream
+-
+memory
+-
+stdexcept
+-
+string
+-
+array
+-
+stdbool.h
+-
 
 /disk/packages/sky/skywifi/src/skywifi.hpp
 boost/property_tree/ptree.hpp

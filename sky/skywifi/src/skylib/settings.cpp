@@ -17,8 +17,6 @@ inline ptree loadFromFile(const char* filename ) {
     return current_settings;
 }
 
-ptree settings = loadFromFile("/etc/config.json");
-
 inline std::string getValue( const char* option ) {
     return settings.get_value( option );
 }

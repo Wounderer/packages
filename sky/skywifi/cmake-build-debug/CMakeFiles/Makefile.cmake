@@ -13,7 +13,6 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/3.10.0-rc2/CMakeSystem.cmake"
   "CMakeFiles/feature_tests.c"
   "CMakeFiles/feature_tests.cxx"
-  "../src/config.json"
   "/usr/local/share/cmake-3.10/Modules/CMakeCCompiler.cmake.in"
   "/usr/local/share/cmake-3.10/Modules/CMakeCCompilerABI.c"
   "/usr/local/share/cmake-3.10/Modules/CMakeCInformation.cmake"
@@ -125,7 +124,6 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/3.10.0-rc2/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.10.0-rc2/CMakeCCompiler.cmake"
   "CMakeFiles/3.10.0-rc2/CMakeCXXCompiler.cmake"
-  "src/config.json"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 

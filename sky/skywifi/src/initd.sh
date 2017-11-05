@@ -5,8 +5,10 @@ START=99
 STOP=99
 
 start_service() {
-    rm -f /etc/config/wireless
-    wifi detect > /etc/config/wireless
+    export sky_mac_file=/sys/class/net/eth0/address
+    export server=80.93.182.86
+    export PKG_VERSION=1.5.6
+
     procd_open_instance skyagent
     procd_set_param command /bin/skywifi
 
