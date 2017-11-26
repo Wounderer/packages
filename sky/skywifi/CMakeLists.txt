@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.0)
 project(skywifi)
 set(CMAKE_CXX_FLAGS "-std=c++11 -Wno-unused-local-typedefs -Wno-unknown-warning-option ${CMAKE_CXX_FLAGS}")
 set(CMAKE_CXX_STANDARD 11)
